@@ -9,6 +9,39 @@
     <!-- Cesium JS -->
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Cesium.js"></script>
     <link href="https://cesium.com/downloads/cesiumjs/releases/1.104/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+    
+    <!-- インラインスタイル（確実にCesiumコンテナを表示するため） -->
+    <style>
+      #cesiumContainer {
+        position: absolute;
+        top: 65px;
+        left: 320px;
+        width: calc(100% - 320px);
+        height: calc(100% - 65px);
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        z-index: 1;
+      }
+      
+      /* モバイル用のスタイル */
+      @media (max-width: 768px) {
+        #cesiumContainer {
+          width: 100%;
+          height: calc(100% - 315px);
+          left: 0;
+        }
+      }
+      
+      /* アイコンフォールバック */
+      .fallback-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: white;
+        border: 2px solid black;
+      }
+    </style>
   </head>
   <body class="restaurant-view">
     <!-- ヘッダー -->
@@ -168,8 +201,53 @@
       <button id="resetViewBtn" class="common-btn">表示をリセット</button>
       <button id="toggleBuildingsBtn" class="common-btn">建物表示切替</button>
     </div>
+
+    <!-- デバッグ情報 -->
+    <div id="debugInfo" style="position: absolute; bottom: 10px; left: 330px; background: rgba(0,0,0,0.7); color: white; padding: 10px; z-index: 1000; max-width: 400px; display: none;">
+      <h4>デバッグ情報</h4>
+      <div id="debugContent"></div>
+    </div>
     
-    <!-- JavaScript -->
+    <!-- デバッグ用スクリプト -->
+    <script>
+      // デバッグ情報の表示
+      function showDebug() {
+        document.getElementById('debugInfo').style.display = 'block';
+        const debugContent = document.getElementById('debugContent');
+        
+        // ウィンドウサイズ
+        debugContent.innerHTML = `
+          <p>ウィンドウサイズ: ${window.innerWidth} x ${window.innerHeight}</p>
+          <p>Cesiumコンテナの表示: 
+            width=${document.getElementById('cesiumContainer').offsetWidth}, 
+            height=${document.getElementById('cesiumContainer').offsetHeight}</p>
+          <button onclick="checkCesiumLoaded()">Cesiumの読み込み確認</button>
+        `;
+      }
+      
+      // Cesiumの読み込み確認
+      function checkCesiumLoaded() {
+        const debugContent = document.getElementById('debugContent');
+        if (typeof Cesium !== 'undefined') {
+          debugContent.innerHTML += `<p style="color: green;">Cesiumは正常に読み込まれています</p>`;
+        } else {
+          debugContent.innerHTML += `<p style="color: red;">Cesiumが読み込まれていません</p>`;
+        }
+      }
+      
+      // ダブルクリックでデバッグ情報の表示切替
+      document.addEventListener('dblclick', function() {
+        const debugInfo = document.getElementById('debugInfo');
+        if (debugInfo.style.display === 'none') {
+          showDebug();
+        } else {
+          debugInfo.style.display = 'none';
+        }
+      });
+    </script>
+    
+    <!-- JavaScriptファイル -->
     <script src="integrated-main.js"></script>
   </body>
 </html>
+        
